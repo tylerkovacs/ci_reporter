@@ -44,7 +44,7 @@ module CI
       attr_accessor :formatter
       def initialize(*args)
         super
-        @formatter ||= Spec::Core::Formatters::ProgressBarFormatter.new(*args)
+        @formatter ||= Spec::Core::Formatters::ProgressFormatter.new(*args)
         @report_manager = ReportManager.new("spec")
         @suite = nil
       end
