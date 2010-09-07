@@ -6,8 +6,8 @@ require 'ci/reporter/core'
 tried_gem = false
 begin
   require 'spec'
-  require 'spec/runner/formatter/progress_bar_formatter'
-  require 'spec/runner/formatter/specdoc_formatter'
+  require 'spec/core/formatters/progress_formatter'
+  require 'spec/core/formatters/base_formatter'
 rescue LoadError
   unless tried_gem
     tried_gem = true
@@ -39,17 +39,18 @@ module CI
     end
 
     # Custom +RSpec+ formatter used to hook into the spec runs and capture results.
-    class RSpec < Spec::Runner::Formatter::BaseFormatter
+    class RSpec < Spec::Core::Formatters::BaseFormatter
       attr_accessor :report_manager
       attr_accessor :formatter
       def initialize(*args)
         super
-        @formatter ||= Spec::Runner::Formatter::ProgressBarFormatter.new(*args)
+        @formatter ||= Spec::Core::Formatters::ProgressBarFormatter.new(*args)
         @report_manager = ReportManager.new("spec")
         @suite = nil
       end
 
       def start(spec_count)
+        @start = Time.now
         @formatter.start(spec_count)
       end
 
@@ -140,7 +141,7 @@ module CI
 
     class RSpecDoc < RSpec
       def initialize(*args)
-        @formatter = Spec::Runner::Formatter::SpecdocFormatter.new(*args)
+        @formatter = Spec::Core::Formatters::SpecdocFormatter.new(*args)
         super
       end
     end
