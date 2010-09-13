@@ -21,21 +21,21 @@ module CI
   module Reporter
     # Wrapper around a <code>RSpec</code> error or failure to be used by the test suite to interpret results.
     class RSpecFailure
-      def initialize(failure)
-        @failure = failure
+      def initialize(example)
+        @example = example
       end
 
       def failure?
-        @failure.expectation_not_met?
+        @example.execution_result[:status] == 'failed'
       end
 
       def error?
-        !@failure.expectation_not_met?
+        !failure?
       end
 
-      def name() @failure.exception.class.name end
-      def message() @failure.exception.message end
-      def location() @failure.exception.backtrace.join("\n") end
+      def name() @example.execution_result[:exception_encountered].class.name end
+      def message() @example.execution_result[:exception_encountered].message end
+      def location() @example.execution_result[:exception_encountered].backtrace.join("\n") end
     end
 
     # Custom +RSpec+ formatter used to hook into the spec runs and capture results.
@@ -72,27 +72,29 @@ module CI
         new_suite(example_group.description)
       end
 
-      def example_started(name)
-        @formatter.example_started(name)
-        name = name.description if name.respond_to?(:description)
-        spec = TestCase.new name
+      def example_started(example)
+        @formatter.example_started(example)
+        example = example.description if example.respond_to?(:description)
+        spec = TestCase.new example
         @suite.testcases << spec
         spec.start
       end
 
-      def example_failed(name, counter, failure)
-        @formatter.example_failed(name, counter, failure)
+      def example_failed(example)
+        name = example.full_description
+
+        @formatter.example_failed(example)
         # In case we fail in before(:all)
         if @suite.testcases.empty?
-          example_started(name)
+          example_started(example)
         end
         spec = @suite.testcases.last
         spec.finish
-        spec.failures << RSpecFailure.new(failure)
+        spec.failures << RSpecFailure.new(example)
       end
 
-      def example_passed(name)
-        @formatter.example_passed(name)
+      def example_passed(example)
+        @formatter.example_passed(example)
         spec = @suite.testcases.last
         spec.finish
       end
