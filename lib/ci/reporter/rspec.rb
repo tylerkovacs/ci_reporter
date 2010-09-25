@@ -39,12 +39,12 @@ module CI
     end
 
     # Custom +RSpec+ formatter used to hook into the spec runs and capture results.
-    class RSpec < Spec::Core::Formatters::BaseFormatter
+    class RSpec < ::RSpec::Core::Formatters::BaseFormatter
       attr_accessor :report_manager
       attr_accessor :formatter
       def initialize(*args)
         super
-        @formatter ||= Spec::Core::Formatters::ProgressFormatter.new(*args)
+        @formatter ||= ::RSpec::Core::Formatters::ProgressFormatter.new(*args)
         @report_manager = ReportManager.new("spec")
         @suite = nil
       end
