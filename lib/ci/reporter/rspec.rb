@@ -5,9 +5,9 @@
 require 'ci/reporter/core'
 tried_gem = false
 begin
-  require 'spec'
-  require 'spec/core/formatters/progress_formatter'
-  require 'spec/core/formatters/base_formatter'
+  require 'rspec'
+  require 'rspec/core/formatters/progress_formatter'
+  require 'rspec/core/formatters/base_formatter'
 rescue LoadError
   unless tried_gem
     tried_gem = true
@@ -143,7 +143,7 @@ module CI
 
     class RSpecDoc < RSpec
       def initialize(*args)
-        @formatter = Spec::Core::Formatters::SpecdocFormatter.new(*args)
+        @formatter = ::RSpec::Core::Formatters::SpecdocFormatter.new(*args)
         super
       end
     end
