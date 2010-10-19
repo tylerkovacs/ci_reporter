@@ -69,7 +69,8 @@ module CI
       # rspec >= 1.2.4
       def example_group_started(example_group)
         @formatter.example_group_started(example_group)
-        new_suite(example_group.description)
+        description = example_group.ancestors.reverse.map(&:description).join(' ')
+        new_suite(description)
       end
 
       def example_started(example)
